@@ -145,7 +145,7 @@ class Dashboard extends Component {
             <img onerror="this.style.display='none'" src={this.state.image}
               style={{ paddingBottom: '2%' }} alt='profilePicture' width='120px' />
 
-            <Button fluid color='grey' inverted compact>
+            <Button href='https://onepageclient-etgjrsxwmb.now.sh' fluid color='grey' inverted compact>
               View Profile
               </Button>
 
