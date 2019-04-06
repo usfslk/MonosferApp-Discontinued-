@@ -4,7 +4,7 @@
 
 import {
   Button, Form, Dimmer, Divider,
-  Message, Loader, Input
+  Message, Loader, Input,
 } from 'semantic-ui-react';
 
 import React, { Component } from "react";
@@ -45,7 +45,7 @@ class Home extends Component {
       window.scrollTo(0, 0);
     }).catch((error) => {
       console.log(error);
-      this.setState({ loginError: true, loading: false, });
+      this.setState({ loginError: true, signupError: false, loading: false, });
     });
   }
 
@@ -61,10 +61,18 @@ class Home extends Component {
             photoURL: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQdVmHPt9SajdsWlAZWzqRXkd-SzmmO9bBUV45fLnw5giijsty3OA',
           }).then((s) => {
             fire.database()
+              .ref(`usersDB/${userCredentials.user.displayName}/`)
+              .update({
+                uid: userCredentials.user.uid,
+                email: userCredentials.user.email,
+              })
+            fire.database()
               .ref(`master/${userCredentials.user.displayName}/setup/`)
               .update({
                 bio: 'Be original',
                 accent: '#0062b1',
+                fullName: userCredentials.user.displayName,
+                photoURL: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQdVmHPt9SajdsWlAZWzqRXkd-SzmmO9bBUV45fLnw5giijsty3OA',
               })
               .then(() => {
                 window.location.reload();
@@ -74,7 +82,7 @@ class Home extends Component {
       })
       .catch(function (error) {
         console.log(error);
-        self.setState({ signupError: true, loading: false, });
+        self.setState({ signupError: true, loginError: false, loading: false, });
       });
   }
 
@@ -91,27 +99,6 @@ class Home extends Component {
     return (
       <div className="homeContainer">
         <Divider hidden />
-        <h1>Make Your Social Bio Link Count</h1>
-        <p>You can add only one url to your social profiles so what link do you add?
-          Do you add Twitter, Facebook, Instagram, your blog, your online store?
-          We have the solution to your problem; with Linkkle you just need one link.</p>
-
-        <h3>How Does It Work?</h3>
-        <p>After you signup you can complete a profile then add your important links.
-           You can then share your Linkkle profile url in your social media,
-           email signatures or wherever else you need people to see your links, it's that easy.
-           Never worry about what link to add in your social profiles again!</p>
-
-        <h3>What’s The Catch?</h3>
-        <p>No catch at all, Linkkle is a free service that can be used by anybody from bloggers
-           to major companies, basically anyone who needs a hub for their important links and want to track
-           clicks and save time by offering a single url to share.</p>
-
-        <Divider hidden />
-        <Button fluid color='black' inverted compact>
-          Demo Account
-          </Button>
-        <Divider hidden />
 
         {this.state.loading ?
           <Dimmer active>
@@ -119,9 +106,29 @@ class Home extends Component {
           </Dimmer>
           : null}
 
-        {this.state.loginError ? (
+        {!this.state.loading ? (
           <div>
+            <h1>Make Your Social Bio Link Count</h1>
+            <p>You can add only one url to your social profiles so what link do you add?
+              Do you add Twitter, Facebook, Instagram, your blog, your online store?
+            We have the solution to your problem; with Linkkle you just need one link.</p>
+
+            <h3>How Does It Work?</h3>
+            <p>After you signup you can complete a profile then add your important links.
+                You can then share your Linkkle profile url in your social media,
+                email signatures or wherever else you need people to see your links, it's that easy.
+              Never worry about what link to add in your social profiles again!</p>
+
             <Divider hidden />
+            <Button fluid color='black'>
+              Demo Account
+            </Button>
+            <Divider hidden />
+          </div>
+        ) : null}
+
+        {this.state.loginError && !this.state.loading ? (
+          <div>
             <Message negative>
               <Message.Header>Please double-check and try again</Message.Header>
               <p>The password you entered did not match our records.</p>
@@ -130,9 +137,8 @@ class Home extends Component {
           </div>
         ) : null}
 
-        {this.state.signupError ? (
+        {this.state.signupError && !this.state.loading ? (
           <div>
-            <Divider hidden />
             <Message negative>
               <Message.Header>The email you entered is already in use.</Message.Header>
               <p>Please choose another one or login to your account.</p>
@@ -141,45 +147,46 @@ class Home extends Component {
           </div>
         ) : null}
 
-        {this.state.init ?
-          <Form>
-            <Form.Input
-              type="text" onChange={this.handleChange}
-              placeholder="Email" name="email" autoComplete="username" />
-            <Form.Input
-              type="password" onChange={this.handleChange}
-              placeholder="Password" name="password" autoComplete="current-password" />
-            <Divider hidden />
-            <Button inverted onClick={this.login} >
-              Login
-          </Button>
-            <Button inverted onClick={this.init} >
-              Create Account
-          </Button>
-          </Form>
-          :
-          <Form>
-            <Form.Input
-              type="text" onChange={this.handleChange}
-              placeholder="Email" name="email" autoComplete="username" />
-            <Form.Input
-              type="password" onChange={this.handleChange}
-              placeholder="Password" name="password" autoComplete="current-password" />
-            <Divider hidden />
-            <Input fluid
-              required
-              type='url'
-              label='http://onepage.com/'
-              onChange={this.handleChange}
-              name="username"
-              placeholder='Username' />
-            <Divider hidden />
-            <Button inverted onClick={this.signup}>
-              Signup
-          </Button>
-            <h2>{this.state.username}</h2>
-          </Form>
-        }
+        {!this.state.loading ? <div>
+          {this.state.init ?
+            <Form>
+              <Form.Input icon='at' iconPosition='left'
+                type="text" onChange={this.handleChange}
+                placeholder="Email" name="email" autoComplete="username" >
+              </Form.Input>
+
+              <Form.Input icon='lock' iconPosition='left'
+                type="password" onChange={this.handleChange}
+                placeholder="Password" name="password" autoComplete="current-password" />
+              <Divider hidden />
+              <Button inverted onClick={this.login} >
+                Log in
+              </Button>
+              <Button inverted style={{ marginLeft: '2%' }} onClick={this.init} >
+                Create Account
+              </Button>
+            </Form>
+            :
+            <Form>
+              <Form.Input icon='at' iconPosition='left'
+                type="text" onChange={this.handleChange}
+                placeholder="Email" name="email" autoComplete="username" />
+              <Form.Input icon='lock' iconPosition='left'
+                type="password" onChange={this.handleChange}
+                placeholder="Password" name="password" autoComplete="current-password" />
+              <Input fluid
+                icon='user' iconPosition='right'
+                type='url'
+                label='http://onepage.com/'
+                onChange={this.handleChange}
+                name="username"
+                placeholder='Username' />
+              <Divider hidden />
+              <Button inverted onClick={this.signup}>
+                Sign up
+              </Button>
+            </Form>
+          } </div> : null}
 
         <Divider hidden />
       </div>

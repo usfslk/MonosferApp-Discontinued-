@@ -4,7 +4,7 @@
 import {
   Button, Form, Divider,
   Dimmer, Loader, TextArea,
-  Message, Segment
+  Message, Modal, Header,
 } from 'semantic-ui-react';
 import React, { Component } from "react";
 import fire from "../config/Fire";
@@ -23,64 +23,8 @@ class Dashboard extends Component {
     };
   }
 
-  // Form Handler
-  handleChange = e => {
-    this.setState({ [e.target.name]: e.target.value });
-  };
-
-  newURL = e => {
-    this.setState({ loading: true, updateSuccess: false });
-    e.preventDefault();
-    const { currentUser } = fire.auth();
-    let title = this.state.title;
-    let link = this.state.link;
-    fire
-      .database()
-      .ref(`master/${currentUser.displayName}/links/`)
-      .push({
-        title,
-        link,
-      })
-      .then(() => {
-        this.setState({ loading: false, updateSuccess: true });
-      });
-  };
-
-  editProfile = e => {
-    this.setState({ loading: true, updateSuccess: false, dimmed: true });
-    e.preventDefault();
-    const { currentUser } = fire.auth();
-    fire
-      .database()
-      .ref(`master/${currentUser.displayName}/setup/`)
-      .update({
-        bio: this.state.bio,
-        fullName: this.state.name,
-        photoURL: this.state.image,
-        accent: this.state.accent,
-      })
-      .then(() => {
-        currentUser.updateProfile({
-          photoURL: this.state.image,
-        })
-        this.setState({ loading: false, updateSuccess: true, dimmed: false })
-      });
-  };
-
-
-  logout() {
-    window.location.reload()
-    fire.auth().signOut();
-  }
-
-  delete = (index) => {
-    const { currentUser } = fire.auth();
-    fire.database().ref(`master/${currentUser.displayName}/links/${this.state.keys[index]}`)
-      .remove()
-  }
-
   componentDidMount = () => {
-    this.setState({ loading: true })
+    this.setState({ loading: true });
     const { currentUser } = fire.auth();
     this.setState({
       name: currentUser.displayName,
@@ -113,9 +57,63 @@ class Dashboard extends Component {
       });
   }
 
+  newURL = e => {
+    this.setState({ loading: true, updateSuccess: false });
+    e.preventDefault();
+    const { currentUser } = fire.auth();
+    let title = this.state.title;
+    let link = this.state.link;
+    fire
+      .database()
+      .ref(`master/${currentUser.displayName}/links/`)
+      .push({
+        title,
+        link,
+      })
+      .then(() => {
+        this.setState({ loading: false, updateSuccess: true });
+      });
+  };
+
+  editProfile = e => {
+    this.setState({ loading: true, updateSuccess: false, dimmed: true });
+    e.preventDefault();
+    const { currentUser } = fire.auth();
+    fire
+      .database()
+      .ref(`master/${currentUser.displayName}/setup/`)
+      .update({
+        bio: this.state.bio,
+        fullName: this.state.fullName,
+        photoURL: this.state.image,
+        accent: this.state.accent,
+      })
+      .then(() => {
+        currentUser.updateProfile({
+          photoURL: this.state.image,
+        })
+        this.setState({ loading: false, updateSuccess: true, dimmed: false })
+      });
+  };
+
+  // Handlers
+
+  handleChange = e => {
+    this.setState({ [e.target.name]: e.target.value });
+  };
   handleChangeComplete = (color) => {
     this.setState({ accent: color.hex });
   };
+  logout() {
+    window.location.reload()
+    fire.auth().signOut();
+  };
+  delete = (index) => {
+    const { currentUser } = fire.auth();
+    fire.database().ref(`master/${currentUser.displayName}/links/${this.state.keys[index]}`)
+      .remove()
+  };
+  handleClose = () => this.setState({ updateSuccess: false });
 
   render() {
     const { dimmed } = this.state
@@ -132,91 +130,88 @@ class Dashboard extends Component {
     );
     return (
       <div className="dashboard">
-        <Dimmer.Dimmable blurring dimmed={dimmed}>
-          <Divider hidden />
+        <Divider hidden />
 
-          <h1>Hello {this.state.name}</h1>
-          <p>{this.state.bio}</p>
-          <img src={this.state.image} style={{ paddingBottom: '2%' }} alt='profilePicture' width='120px' />
+        {this.state.loading ?
+          <Dimmer active>
+            <Loader>Loading</Loader>
+          </Dimmer>
+          : null}
 
-          <Button fluid color='grey' inverted compact>
-            View Profile
-            </Button>
+        {!this.state.loading ?
+          <div>
+            <h1>Hello {this.state.name}</h1>
+            <p style={{ whiteSpace: 'pre-wrap' }}>{this.state.bio}</p>
+            <img onerror="this.style.display='none'" src={this.state.image}
+              style={{ paddingBottom: '2%' }} alt='profilePicture' width='120px' />
 
-          {this.state.loading ?
-            <div>
-              <Divider hidden />
-              <Loader inline
-                size='medium'
-                inverted active>Loading</Loader>
-              <Divider hidden />
-            </div>
-            : null}
-
-          <h3>Edit Profile</h3>
-          <Divider hidden />
-
-          <Form inverted>
-            <Form.Input
-              type="text" onChange={this.handleChange}
-              placeholder="Full Name" name="name" />
-            <Form.Input
-              type="text" onChange={this.handleChange}
-              placeholder="Profile Image" name="image" />
-            <TextArea placeholder="Bio" name="bio"
-              onChange={this.handleChange} style={{ minHeight: 100 }} />
-
-            <h5>Accent color:</h5>
-            <p style={{ color: this.state.accent }}>{this.state.accent}</p>
-            <div style={{ backgroundColor: this.state.accent, height: '2vh', width: '2vh' }} />
-            <Divider hidden />
-            <CompactPicker id='picker'
-              color={this.state.accent}
-              onChangeComplete={this.handleChangeComplete}
-            />
-
-            <Divider hidden />
-            <Button inverted
-              onClick={this.editProfile}>
-              Save
+            <Button fluid color='grey' inverted compact>
+              View Profile
               </Button>
-            <Divider hidden />
-          </Form>
 
-          {this.state.updateSuccess ? (
-            <div>
-              <Message positive>
-                <Message.Header>Updated successfully!</Message.Header>
-                <p>Data has been saved.</p>
-              </Message>
-            </div>
-          ) : null}
-
-          <h3>Add Link</h3>
-          <Divider hidden />
-          <Form>
-            <Form.Input
-              type="text" onChange={this.handleChange}
-              placeholder="Title" name="title" />
-            <Form.Input
-              type="text" onChange={this.handleChange}
-              placeholder="Link" name="link" />
+            <h3>Edit Profile</h3>
             <Divider hidden />
-            <Button onClick={this.newURL} inverted>
-              Submit
+
+            <Form inverted>
+              <Form.Input
+                type="text" onChange={this.handleChange}
+                placeholder="Full Name" name="fullName" />
+              <Form.Input
+                type="text" onChange={this.handleChange}
+                placeholder="Profile Image URL" name="image" />
+              <TextArea placeholder="Bio" name="bio"
+                onChange={this.handleChange} style={{ minHeight: 100 }} />
+              <h5>Accent color:</h5>
+              <p style={{ color: this.state.accent }}>{this.state.accent}</p>
+              <div style={{ backgroundColor: this.state.accent, height: '2vh', width: '2vh' }} />
+              <Divider hidden />
+              <CompactPicker id='picker'
+                color={this.state.accent}
+                onChangeComplete={this.handleChangeComplete}
+              />
+              <Divider hidden />
+              <Button inverted
+                onClick={this.editProfile}>
+                Save
+                </Button>
+              <Divider hidden />
+            </Form>
+
+            <h3>Add Link</h3>
+            <Divider hidden />
+
+            <Form>
+              <Form.Input
+                type="text" onChange={this.handleChange}
+                placeholder="Title" name="title" />
+              <Form.Input
+                type="text" onChange={this.handleChange}
+                placeholder="Link" name="link" />
+              <Divider hidden />
+              <Button onClick={this.newURL} inverted>
+                Submit
+                </Button>
+            </Form>
+
+            <Divider hidden />
+            {listItems}
+
+            <Button onClick={this.logout} color='red'>
+              Log Out
               </Button>
-          </Form>
+          </div>
+          : null}
 
-          <Divider hidden />
-          {listItems}
-          <Divider hidden />
+        <Modal onClose={this.handleClose} dimmer={dimmed} size='mini' open={this.state.updateSuccess} centered={false}>
+          <Header icon='checkmark' color='green' content='Updated successfully!' />
+          <Modal.Content>
+            <Modal.Description>
+              <p>Data has been saved.</p>
+            </Modal.Description>
+          </Modal.Content>
+        </Modal>
 
-          <Button onClick={this.logout} color='red'>
-            Log Out
-            </Button>
-
-          <Divider hidden />
-        </Dimmer.Dimmable>
+        <Divider hidden />
       </div>
     );
   }
