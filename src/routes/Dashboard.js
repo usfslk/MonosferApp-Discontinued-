@@ -123,15 +123,12 @@ class Dashboard extends Component {
       <div key={index}>
         <Message color='black'>
           <Button onClick={() => this.delete(index)}
-            compact circular
-            icon='delete'
-            color='grey'
-          />
+            compact circular icon='delete'
+            color='grey' />
           {item.title}
         </Message>
         <Divider hidden />
       </div>
-
     );
     return (
       <div className="dashboard">
@@ -140,10 +137,11 @@ class Dashboard extends Component {
 
           <h1>Hello {this.state.name}</h1>
           <p>{this.state.bio}</p>
-
           <img src={this.state.image} style={{ paddingBottom: '2%' }} alt='profilePicture' width='120px' />
 
-
+          <Button fluid color='grey' inverted compact>
+            View Profile
+            </Button>
 
           {this.state.loading ?
             <div>
@@ -165,21 +163,23 @@ class Dashboard extends Component {
             <Form.Input
               type="text" onChange={this.handleChange}
               placeholder="Profile Image" name="image" />
-            <Form.Input
-              type="text" onChange={this.handleChange}
-              placeholder="Accent Color" name="accent" />
+            <TextArea placeholder="Bio" name="bio"
+              onChange={this.handleChange} style={{ minHeight: 100 }} />
 
+            <h5>Accent color:</h5>
+            <p style={{ color: this.state.accent }}>{this.state.accent}</p>
+            <div style={{ backgroundColor: this.state.accent, height: '2vh', width: '2vh' }} />
+            <Divider hidden />
             <CompactPicker id='picker'
               color={this.state.accent}
               onChangeComplete={this.handleChangeComplete}
             />
 
-            <TextArea placeholder="Bio" name="bio"
-              onChange={this.handleChange} style={{ minHeight: 100 }} />
             <Divider hidden />
-            <Button onClick={this.editProfile} inverted >
+            <Button inverted
+              onClick={this.editProfile}>
               Save
-          </Button>
+              </Button>
             <Divider hidden />
           </Form>
 
@@ -194,7 +194,6 @@ class Dashboard extends Component {
 
           <h3>Add Link</h3>
           <Divider hidden />
-
           <Form>
             <Form.Input
               type="text" onChange={this.handleChange}
@@ -205,23 +204,18 @@ class Dashboard extends Component {
             <Divider hidden />
             <Button onClick={this.newURL} inverted>
               Submit
-          </Button>
+              </Button>
           </Form>
 
           <Divider hidden />
           {listItems}
           <Divider hidden />
 
-          <Button fluid color='grey' inverted compact>
-            View Profile
-          </Button>
-
-          <Divider hidden />
           <Button onClick={this.logout} color='red'>
             Log Out
             </Button>
-          <Divider hidden />
 
+          <Divider hidden />
         </Dimmer.Dimmable>
       </div>
     );

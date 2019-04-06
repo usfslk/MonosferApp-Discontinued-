@@ -64,6 +64,7 @@ class Home extends Component {
               .ref(`master/${userCredentials.user.displayName}/setup/`)
               .update({
                 bio: 'Be original',
+                accent: '#0062b1',
               })
               .then(() => {
                 window.location.reload();
