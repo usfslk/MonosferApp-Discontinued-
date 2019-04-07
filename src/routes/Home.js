@@ -5,6 +5,7 @@
 import {
   Button, Form, Dimmer, Divider,
   Message, Loader, Input, Image,
+  Label, Icon,
 } from 'semantic-ui-react';
 
 import React, { Component } from "react";
@@ -22,7 +23,6 @@ class Home extends Component {
       loading: true,
       error: false,
       loggedIn: true,
-      remember: false,
       init: true
     };
   }
@@ -31,7 +31,15 @@ class Home extends Component {
   componentDidMount = () => {
     fire.auth().onAuthStateChanged(user => {
       if (user) {
-        this.setState({ loading: false, loggedIn: true });
+        fire.database().ref(`/master/${user.displayName}/setup/`)
+          .once('value', snapshot => {
+            var obj = snapshot.val()
+            this.setState({
+              free: obj.free,
+              loading: false,
+              loggedIn: true,
+            })
+          })
       } else {
         this.setState({ loading: false, loggedIn: false });
       }
@@ -179,30 +187,51 @@ class Home extends Component {
                 onChange={this.handleChange}
                 name="username"
                 placeholder='Username' />
-                <p>
-                Your username must not contain spaces, special characters like "." , "#" , "$" or emojis. 
+              <p>
+                Your username must not contain spaces, special characters like "." , "#" , "$" or emojis.
                 </p>
-                <h6>
+              <h6>
                 By continuing you agree to our terms of services.
                 </h6>
               <Button inverted onClick={this.signup}>
                 Sign up
               </Button>
             </Form>
-          } 
-          </div> 
+          }
+        </div>
           :
           <div>
             <p>
-            You have successfully logged in. 
+              You have successfully logged in.
             </p>
             <Button color="black"
               href="/dashboard" inverted
               onClick="function hi(){ window.location.reload()};hi()"
             >
-            Dashboard
+              Dashboard
             </Button>
-            </div>
+            {this.state.free ?
+              <div>
+                <Divider hidden />
+                <Label size='tiny'
+                  color='black'
+                  horizontal>
+                  <Icon name='info circle' /> Ad
+                </Label>
+                <Divider hidden />
+                <a href="https://chrysntm.com/" target="_blank" title="Chrysntm Ad">
+                  <img style={{ width: '100%' }} src="https://i.imgur.com/P5DTq98.jpg" alt="ad" />
+                </a>
+              </div>
+              :
+              <div>
+                <Divider hidden />
+                <Label color='white' horizontal>
+                  Premium Account
+                 </Label>
+              </div>
+            }
+          </div>
         }
 
         <Divider hidden />

@@ -5,7 +5,7 @@ import {
   Button, Form, Divider,
   Dimmer, Loader, TextArea,
   Message, Modal, Header,
-  Input, Label
+  Input, Label, Icon
 } from 'semantic-ui-react';
 import React, { Component } from "react";
 import fire from "../config/Fire";
@@ -201,12 +201,12 @@ class Dashboard extends Component {
             <Divider hidden />
 
             {this.state.free ?
-            <Label color='white' horizontal>
-              Free
+              <Label color='white' horizontal>
+                Free
             </Label>
-            :
-            <Label color='white' horizontal>
-              Premium
+              :
+              <Label color='white' horizontal>
+                Premium
             </Label>
             }
 
@@ -250,7 +250,20 @@ class Dashboard extends Component {
 
             {this.state.free ?
               <div>
-                <p>This is a free account please upgrade so you can add links.</p>
+
+                <Label size='tiny'
+                  color='black'
+                  horizontal>
+                  <Icon name='info circle' /> Ad
+                </Label>
+                <Divider hidden />
+                <a href="https://chrysntm.com/" target="_blank" title="Chrysntm Ad">
+                  <img style={{ width: '100%' }} src="https://i.imgur.com/P5DTq98.jpg" alt="ad" />
+                </a>
+
+                <Divider hidden />
+
+                <p>This is a free account please upgrade to edit your links.</p>
                 <h5>Premium Account Lifetime Subscription (Ad-free)</h5>
 
                 <h2>$25</h2>
@@ -311,6 +324,8 @@ class Dashboard extends Component {
             </Button>
           </div>
           : null}
+
+        {this.state.logged}
 
 
         <Modal onClose={this.handleClose}
