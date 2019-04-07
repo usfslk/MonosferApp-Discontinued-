@@ -37,7 +37,7 @@ class Dashboard extends Component {
         this.setState({
           bio: obj.bio,
           fullName: obj.fullName,
-          name: obj.fullName,
+          username: obj.displayName,
           accent: obj.accent,
         })
       })
@@ -145,7 +145,7 @@ class Dashboard extends Component {
             <img onerror="this.style.display='none'" src={this.state.image}
               style={{ paddingBottom: '2%' }} alt='profilePicture' width='120px' />
 
-            <Button href='https://onepageclient-etgjrsxwmb.now.sh' fluid color='grey' inverted compact>
+            <Button href={'https://monosfer.com/' + this.state.name} target='_blank' fluid color='grey' inverted compact>
               View Profile
               </Button>
 

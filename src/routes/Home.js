@@ -4,12 +4,15 @@
 
 import {
   Button, Form, Dimmer, Divider,
-  Message, Loader, Input,
+  Message, Loader, Input, Image,
 } from 'semantic-ui-react';
 
 import React, { Component } from "react";
 import fire from "../config/Fire";
 import "../App.css";
+import logo from './logo.png';
+import robot from './robot.png';
+import sat from './sat.png';
 
 class Home extends Component {
   constructor(props) {
@@ -72,6 +75,7 @@ class Home extends Component {
                 bio: 'Be original',
                 accent: '#0062b1',
                 fullName: userCredentials.user.displayName,
+                displayName: userCredentials.user.displayName,
                 photoURL: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQdVmHPt9SajdsWlAZWzqRXkd-SzmmO9bBUV45fLnw5giijsty3OA',
               })
               .then(() => {
@@ -108,21 +112,8 @@ class Home extends Component {
 
         {!this.state.loading ? (
           <div>
-            <h1>Make Your Social Bio Link Count</h1>
-            <p>You can add only one url to your social profiles so what link do you add?
-              Do you add Twitter, Facebook, Instagram, your blog, your online store?
-            We have the solution to your problem; with Linkkle you just need one link.</p>
-
-            <h3>How Does It Work?</h3>
-            <p>After you signup you can complete a profile then add your important links.
-                You can then share your Linkkle profile url in your social media,
-                email signatures or wherever else you need people to see your links, it's that easy.
-              Never worry about what link to add in your social profiles again!</p>
-
-            <Divider hidden />
-            <Button fluid color='black'>
-              Demo Account
-            </Button>
+            <Image src={sat} size='tiny' alt="logo" />
+            <h1>Monosfer</h1>
             <Divider hidden />
           </div>
         ) : null}
