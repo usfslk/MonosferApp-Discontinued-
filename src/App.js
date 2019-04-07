@@ -38,12 +38,11 @@ class App extends Component {
         <Container className="App">
           <Route path="/" exact component={Home} />
 
-          {this.state.loggedIn ?
-            <div>
+          <div>
               <Route path="/dashboard/" component={Dashboard} />
-              <Route path="/otp/" component={OTP} />
-            </div>
-            : null}
+            <Route path="/otp/" component={OTP} />
+          </div>
+
 
         </Container>
       </Router>

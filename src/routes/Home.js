@@ -174,12 +174,17 @@ class Home extends Component {
                 placeholder="Password" name="password" autoComplete="current-password" />
               <Input fluid
                 icon='user' iconPosition="right"
-                type='url'
-                label='https://monosfer.com/'
+                type='url' pattern='[A-Za-z\\s]*'
+                label='monosfer.com/'
                 onChange={this.handleChange}
                 name="username"
                 placeholder='Username' />
-              <Divider hidden />
+                <p>
+                Your username must not contain spaces, special characters like "." , "#" , "$" or emojis. 
+                </p>
+                <h6>
+                By continuing you agree to our terms of services.
+                </h6>
               <Button inverted onClick={this.signup}>
                 Sign up
               </Button>

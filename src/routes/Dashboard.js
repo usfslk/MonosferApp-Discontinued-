@@ -5,7 +5,7 @@ import {
   Button, Form, Divider,
   Dimmer, Loader, TextArea,
   Message, Modal, Header,
-  Input,
+  Input, Label
 } from 'semantic-ui-react';
 import React, { Component } from "react";
 import fire from "../config/Fire";
@@ -65,6 +65,7 @@ class Dashboard extends Component {
       else {
         this.setState({
           loading: false,
+          error: true,
         })
       }
     });
@@ -123,7 +124,7 @@ class Dashboard extends Component {
             validateOTP: event,
             email: currentUser.email,
           })
-          fire.database()
+        fire.database()
           .ref(`/OTP/`)
           .push({
             id: self.state.userOTP,
@@ -179,14 +180,40 @@ class Dashboard extends Component {
           </Dimmer>
           : null}
 
-        {!this.state.loading ?
+        {this.state.error ? (
           <div>
-            <h1>Hello {this.state.name}</h1>
-            <p style={{ whiteSpace: 'pre-wrap' }}>{this.state.bio}</p>
-            <img src={this.state.image}
-              style={{ paddingBottom: '2%' }} alt='profilePicture' width='120px' />
+            <Message negative>
+              <Message.Header>Error 403</Message.Header>
+              <p>Remote Access Not Allowed</p>
+            </Message>
+            <Divider hidden />
+          </div>
+        ) : null}
 
-            <Button href={'https://monosfer.com/' + this.state.name} target='_blank' fluid color='grey' inverted compact>
+        {!this.state.loading && !this.state.error ?
+          <div>
+            <h1>{this.state.name}</h1>
+            <p style={{ whiteSpace: 'pre-wrap' }}>{this.state.bio}</p>
+
+            <img src={this.state.image}
+              alt='profilePicture' width='120px' />
+
+            <Divider hidden />
+
+            {this.state.free ?
+            <Label color='white' horizontal>
+              Free
+            </Label>
+            :
+            <Label color='white' horizontal>
+              Premium
+            </Label>
+            }
+
+            <Divider hidden />
+
+            <Button href={'https://monosfer.com/' + this.state.name}
+              target='_blank' fluid color='grey' inverted compact>
               View Profile
               </Button>
 
@@ -204,7 +231,10 @@ class Dashboard extends Component {
                 onChange={this.handleChange} style={{ minHeight: 100 }} />
               <h5>Accent color:</h5>
               <p style={{ color: this.state.accent }}>{this.state.accent}</p>
-              <div style={{ backgroundColor: this.state.accent, height: '2vh', width: '2vh' }} />
+              <div style={{
+                backgroundColor: this.state.accent,
+                height: '2vh', width: '2vh'
+              }} />
               <Divider hidden />
               <CompactPicker id='picker'
                 color={this.state.accent}
@@ -241,10 +271,13 @@ class Dashboard extends Component {
                 ) : null}
                 <Divider hidden />
                 <Form inverted>
-                  <Input type="text" onChange={this.handleChange}
-                    placeholder="OTP" name="userOTP" />
+                  <Input type="text" name="userOTP"
+                    onChange={this.handleChange}
+                    placeholder="OTP" />
                   <Divider hidden />
-                  <Button onClick={this.validateOTP} color='black'>
+                  <Button
+                    onClick={this.validateOTP}
+                    color='black'>
                     Submit
                   </Button>
                 </Form>
@@ -253,10 +286,8 @@ class Dashboard extends Component {
               : null}
 
             {!this.state.free ? <div>
-
               <h3>Add Link</h3>
               <Divider hidden />
-
               <Form>
                 <Form.Input
                   type="text" onChange={this.handleChange}
@@ -267,23 +298,25 @@ class Dashboard extends Component {
                 <Divider hidden />
                 <Button onClick={this.newURL} inverted>
                   Submit
-                </Button>
+                    </Button>
               </Form>
-
               <Divider hidden />
               {listItems}
-
             </div>
               : null}
-
-            <Button onClick={this.logout}  href="/" color='red'>
+            <Button
+              onClick={this.logout}
+              href="/" color='red'>
               Log Out
             </Button>
           </div>
           : null}
 
 
-        <Modal onClose={this.handleClose} dimmer='blurring' size='mini' open={this.state.updateSuccess} centered={false}>
+        <Modal onClose={this.handleClose}
+          dimmer='blurring' size='mini'
+          open={this.state.updateSuccess}
+          centered={false}>
           <Header icon='checkmark' color='green' content='Updated successfully!' />
           <Modal.Content>
             <Modal.Description>

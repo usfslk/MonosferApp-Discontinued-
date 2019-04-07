@@ -53,7 +53,8 @@ class OTP extends Component {
                 {this.state.error && !this.state.loading ? (
                     <div>
                         <Message negative>
-                            <Message.Header>You do not have access to this page.</Message.Header>
+                            <Message.Header>Error 403</Message.Header>
+                            <p>Remote Access Not Allowed</p>
                         </Message>
                         <Divider hidden />
                     </div>
