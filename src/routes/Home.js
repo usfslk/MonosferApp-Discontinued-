@@ -168,7 +168,7 @@ class Home extends Component {
               <Input fluid
                 icon='user' iconPosition='right'
                 type='url'
-                label='http://onepage.com/'
+                label='https://monosfer.com/'
                 onChange={this.handleChange}
                 name="username"
                 placeholder='Username' />
