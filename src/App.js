@@ -7,6 +7,8 @@ import fire from './config/Fire';
 import { Container, } from 'semantic-ui-react';
 import Home from './routes/Home';
 import Dashboard from './routes/Dashboard';
+import OTP from './routes/OTP';
+import { BrowserRouter as Router, Route } from "react-router-dom";
 
 class App extends Component {
   constructor(props) {
@@ -32,18 +34,19 @@ class App extends Component {
 
   render() {
     return (
-      <Container className="App">
+      <Router>
+        <Container className="App">
+          <Route path="/" exact component={Home} />
 
-        {this.state.loggedIn && !this.state.loading ? <Dashboard />
-        : <Home /> }
-        
-        {this.state.loading ?
-          <div className="container">
-            <div className="alert bg-white text-center shadow-sm rounded border p-3 m-4" role="alert">
-              Loading ...
-        </div></div>
-          : null}
-      </Container>
+          {this.state.loggedIn ?
+            <div>
+              <Route path="/dashboard/" component={Dashboard} />
+              <Route path="/otp/" component={OTP} />
+            </div>
+            : null}
+
+        </Container>
+      </Router>
     );
   }
 }

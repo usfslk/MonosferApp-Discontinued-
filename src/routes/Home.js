@@ -10,8 +10,6 @@ import {
 import React, { Component } from "react";
 import fire from "../config/Fire";
 import "../App.css";
-import logo from './logo.png';
-import robot from './robot.png';
 import sat from './sat.png';
 
 class Home extends Component {
@@ -40,12 +38,11 @@ class Home extends Component {
     });
   };
 
-
   login = (e) => {
     this.setState({ loading: true });
     e.preventDefault();
     fire.auth().signInWithEmailAndPassword(this.state.email, this.state.password).then((u) => {
-      window.scrollTo(0, 0);
+      this.props.history.push('/dashboard');
     }).catch((error) => {
       console.log(error);
       this.setState({ loginError: true, signupError: false, loading: false, });
@@ -53,9 +50,12 @@ class Home extends Component {
   }
 
   signup = (e) => {
-    this.setState({ loading: true });
+    this.setState({ loading: true, loginError: false, signupError: false });
     e.preventDefault();
     const self = this;
+    var digits = '0123456789';
+    let OTP = '';
+    for (let i = 0; i < 16; i++) { OTP += digits[Math.floor(Math.random() * 10)]; }
     fire.auth().createUserWithEmailAndPassword(this.state.email, this.state.password)
       .then((userCredentials) => {
         if (userCredentials.user) {
@@ -70,18 +70,26 @@ class Home extends Component {
                 email: userCredentials.user.email,
               })
             fire.database()
+              .ref(`master/${userCredentials.user.displayName}/links`)
+              .push({
+                link: 'https://bmc.xyz/l/Bkp9Ifb0P',
+                title: 'Buy Now',
+              })
+            fire.database()
               .ref(`master/${userCredentials.user.displayName}/setup/`)
               .update({
                 bio: 'Be original',
                 accent: '#0062b1',
+                OTP: OTP,
+                free: true,
                 fullName: userCredentials.user.displayName,
                 displayName: userCredentials.user.displayName,
                 photoURL: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQdVmHPt9SajdsWlAZWzqRXkd-SzmmO9bBUV45fLnw5giijsty3OA',
               })
-              .then(() => {
-                window.location.reload();
-              });
           })
+        }
+        else {
+          self.setState({ loading: false, });
         }
       })
       .catch(function (error) {
@@ -98,7 +106,6 @@ class Home extends Component {
   init = e => {
     this.setState({ init: false });
   };
-
   render() {
     return (
       <div className="homeContainer">
@@ -112,7 +119,7 @@ class Home extends Component {
 
         {!this.state.loading ? (
           <div>
-            <Image src={sat} size='tiny' alt="logo" />
+            <Image src={sat} width='75' alt="logo" />
             <h1>Monosfer</h1>
             <Divider hidden />
           </div>
@@ -138,7 +145,7 @@ class Home extends Component {
           </div>
         ) : null}
 
-        {!this.state.loading ? <div>
+        {!this.state.loading && !this.state.loggedIn ? <div>
           {this.state.init ?
             <Form>
               <Form.Input icon='at' iconPosition='left'
@@ -166,7 +173,7 @@ class Home extends Component {
                 type="password" onChange={this.handleChange}
                 placeholder="Password" name="password" autoComplete="current-password" />
               <Input fluid
-                icon='user' iconPosition='right'
+                icon='user' iconPosition="right"
                 type='url'
                 label='https://monosfer.com/'
                 onChange={this.handleChange}
@@ -177,7 +184,21 @@ class Home extends Component {
                 Sign up
               </Button>
             </Form>
-          } </div> : null}
+          } 
+          </div> 
+          :
+          <div>
+            <p>
+            You have successfully logged in. 
+            </p>
+            <Button color="black"
+              href="/dashboard" inverted
+              onClick="function hi(){ window.location.reload()};hi()"
+            >
+            Dashboard
+            </Button>
+            </div>
+        }
 
         <Divider hidden />
       </div>

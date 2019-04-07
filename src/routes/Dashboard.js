@@ -5,11 +5,13 @@ import {
   Button, Form, Divider,
   Dimmer, Loader, TextArea,
   Message, Modal, Header,
+  Input,
 } from 'semantic-ui-react';
 import React, { Component } from "react";
 import fire from "../config/Fire";
 import "../App.css";
 import { CompactPicker } from 'react-color';
+import moment from "moment";
 
 class Dashboard extends Component {
   constructor(props) {
@@ -25,36 +27,47 @@ class Dashboard extends Component {
 
   componentDidMount = () => {
     this.setState({ loading: true });
-    const { currentUser } = fire.auth();
-    this.setState({
-      name: currentUser.displayName,
-      bio: currentUser.bio,
-      image: currentUser.photoURL,
-    })
-    fire.database().ref(`/master/${currentUser.displayName}/setup/`)
-      .on('value', snapshot => {
-        var obj = snapshot.val()
+    fire.auth().onAuthStateChanged(user => {
+      if (user) {
+        const { currentUser } = fire.auth();
         this.setState({
-          bio: obj.bio,
-          fullName: obj.fullName,
-          username: obj.displayName,
-          accent: obj.accent,
+          name: currentUser.displayName,
+          bio: currentUser.bio,
+          image: currentUser.photoURL,
         })
-      })
-    fire.database().ref(`/master/${currentUser.displayName}/links/`)
-      .on('value', snapshot => {
-        var obj = snapshot.val()
-        var data = []
-        var keys = []
-        for (let a in obj) {
-          data.push(obj[a])
-          keys.push(a)
-        }
+        fire.database().ref(`/master/${currentUser.displayName}/setup/`)
+          .once('value', snapshot => {
+            var obj = snapshot.val()
+            this.setState({
+              bio: obj.bio,
+              fullName: obj.fullName,
+              username: obj.displayName,
+              accent: obj.accent,
+              free: obj.free,
+              OTP: obj.OTP,
+            })
+          })
+        fire.database().ref(`/master/${currentUser.displayName}/links/`)
+          .on('value', snapshot => {
+            var obj = snapshot.val()
+            var data = []
+            var keys = []
+            for (let a in obj) {
+              data.push(obj[a])
+              keys.push(a)
+            }
+            this.setState({
+              data: data, keys: keys,
+              loading: false,
+            })
+          });
+      }
+      else {
         this.setState({
-          data: data, keys: keys,
           loading: false,
         })
-      });
+      }
+    });
   }
 
   newURL = e => {
@@ -96,6 +109,36 @@ class Dashboard extends Component {
       });
   };
 
+  validateOTP = e => {
+    this.setState({ loading: true });
+    const self = this;
+    setInterval(function () {
+      if (self.state.OTP === self.state.userOTP) {
+        const { currentUser } = fire.auth();
+        var event = moment().format('MMMM Do YYYY, h:mm:ss a');
+        fire.database()
+          .ref(`master/${currentUser.displayName}/setup/`)
+          .update({
+            free: false,
+            validateOTP: event,
+            email: currentUser.email,
+          })
+          fire.database()
+          .ref(`/OTP/`)
+          .push({
+            id: self.state.userOTP,
+            time: event,
+            email: currentUser.email,
+          })
+          .then(() => {
+            window.location.reload();
+          });
+      } else {
+        self.setState({ OTPError: true, loading: false });
+      }
+    }, 2000);
+  };
+
   // Handlers
 
   handleChange = e => {
@@ -104,8 +147,7 @@ class Dashboard extends Component {
   handleChangeComplete = (color) => {
     this.setState({ accent: color.hex });
   };
-  logout() {
-    window.location.reload()
+  logout(context) {
     fire.auth().signOut();
   };
   delete = (index) => {
@@ -116,7 +158,6 @@ class Dashboard extends Component {
   handleClose = () => this.setState({ updateSuccess: false });
 
   render() {
-    const { dimmed } = this.state
     const listItems = this.state.data.map((item, index) =>
       <div key={index}>
         <Message color='black'>
@@ -142,7 +183,7 @@ class Dashboard extends Component {
           <div>
             <h1>Hello {this.state.name}</h1>
             <p style={{ whiteSpace: 'pre-wrap' }}>{this.state.bio}</p>
-            <img onerror="this.style.display='none'" src={this.state.image}
+            <img src={this.state.image}
               style={{ paddingBottom: '2%' }} alt='profilePicture' width='120px' />
 
             <Button href={'https://monosfer.com/' + this.state.name} target='_blank' fluid color='grey' inverted compact>
@@ -177,32 +218,72 @@ class Dashboard extends Component {
               <Divider hidden />
             </Form>
 
-            <h3>Add Link</h3>
-            <Divider hidden />
+            {this.state.free ?
+              <div>
+                <p>This is a free account please upgrade so you can add links.</p>
+                <h5>Premium Account Lifetime Subscription</h5>
 
-            <Form>
-              <Form.Input
-                type="text" onChange={this.handleChange}
-                placeholder="Title" name="title" />
-              <Form.Input
-                type="text" onChange={this.handleChange}
-                placeholder="Link" name="link" />
-              <Divider hidden />
-              <Button onClick={this.newURL} inverted>
-                Submit
+                <h2>$25</h2>
+                <Button
+                  href='https://bmc.xyz/l/Bkp9Ifb0P'
+                  target='_blank' color='black' inverted compact>
+                  Pay Now
                 </Button>
-            </Form>
+                <Divider hidden />
+                <h3>Confirm your account</h3>
+                <p>Please enter your one-time password</p>
+                {this.state.OTPError && !this.state.loading ? (
+                  <div>
+                    <Message negative>
+                      <Message.Header>Please double-check and try again</Message.Header>
+                    </Message>
+                  </div>
+                ) : null}
+                <Divider hidden />
+                <Form inverted>
+                  <Input type="text" onChange={this.handleChange}
+                    placeholder="OTP" name="userOTP" />
+                  <Divider hidden />
+                  <Button onClick={this.validateOTP} color='black'>
+                    Submit
+                  </Button>
+                </Form>
+                <Divider hidden />
+              </div>
+              : null}
 
-            <Divider hidden />
-            {listItems}
+            {!this.state.free ? <div>
 
-            <Button onClick={this.logout} color='red'>
+              <h3>Add Link</h3>
+              <Divider hidden />
+
+              <Form>
+                <Form.Input
+                  type="text" onChange={this.handleChange}
+                  placeholder="Title" name="title" />
+                <Form.Input
+                  type="text" onChange={this.handleChange}
+                  placeholder="Link" name="link" />
+                <Divider hidden />
+                <Button onClick={this.newURL} inverted>
+                  Submit
+                </Button>
+              </Form>
+
+              <Divider hidden />
+              {listItems}
+
+            </div>
+              : null}
+
+            <Button onClick={this.logout}  href="/" color='red'>
               Log Out
-              </Button>
+            </Button>
           </div>
           : null}
 
-        <Modal onClose={this.handleClose} dimmer={dimmed} size='mini' open={this.state.updateSuccess} centered={false}>
+
+        <Modal onClose={this.handleClose} dimmer='blurring' size='mini' open={this.state.updateSuccess} centered={false}>
           <Header icon='checkmark' color='green' content='Updated successfully!' />
           <Modal.Content>
             <Modal.Description>
