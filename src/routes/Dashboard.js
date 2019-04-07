@@ -251,7 +251,7 @@ class Dashboard extends Component {
             {this.state.free ?
               <div>
                 <p>This is a free account please upgrade so you can add links.</p>
-                <h5>Premium Account Lifetime Subscription</h5>
+                <h5>Premium Account Lifetime Subscription (Ad-free)</h5>
 
                 <h2>$25</h2>
                 <Button
