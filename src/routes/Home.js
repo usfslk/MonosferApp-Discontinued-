@@ -31,15 +31,10 @@ class Home extends Component {
   componentWillMount = () => {
     fire.auth().onAuthStateChanged(user => {
       if (user) {
-        fire.database().ref(`/master/${user.displayName}/setup/`)
-          .once('value', snapshot => {
-            var obj = snapshot.val()
-            this.setState({
-              free: obj.free,
-              loading: false,
-              loggedIn: true,
-            })
-          })
+        this.setState({
+          loading: false,
+          loggedIn: true,
+        })
       } else {
         this.setState({ loading: false, loggedIn: false });
       }
@@ -95,7 +90,7 @@ class Home extends Component {
                 photoURL: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQdVmHPt9SajdsWlAZWzqRXkd-SzmmO9bBUV45fLnw5giijsty3OA',
               })
               .then(() => {
-                this.setState({ loading: false, loggedIn: true});
+                this.setState({ loading: false, loggedIn: true });
                 this.props.history.push('/dashboard');
               })
           })
@@ -214,27 +209,6 @@ class Home extends Component {
             >
               Dashboard
             </Button>
-            {this.state.free ?
-              <div>
-                <Divider hidden />
-                <Label size='tiny'
-                  color='black'
-                  horizontal>
-                  <Icon name='info circle' /> Ad
-                </Label>
-                <Divider hidden />
-                <a href="https://chrysntm.com/" target="_blank" title="Chrysntm Ad">
-                  <img style={{ width: '100%' }} src="https://i.imgur.com/P5DTq98.jpg" alt="ad" />
-                </a>
-              </div>
-              :
-              <div>
-                <Divider hidden />
-                <Label color='white' horizontal>
-                  Premium Account
-                 </Label>
-              </div>
-            }
           </div>
         }
 
