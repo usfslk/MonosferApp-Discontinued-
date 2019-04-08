@@ -28,7 +28,7 @@ class Home extends Component {
   }
 
   // Auth Change Listener
-  componentDidMount = () => {
+  componentWillMount = () => {
     fire.auth().onAuthStateChanged(user => {
       if (user) {
         fire.database().ref(`/master/${user.displayName}/setup/`)
@@ -93,6 +93,10 @@ class Home extends Component {
                 fullName: userCredentials.user.displayName,
                 displayName: userCredentials.user.displayName,
                 photoURL: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQdVmHPt9SajdsWlAZWzqRXkd-SzmmO9bBUV45fLnw5giijsty3OA',
+              })
+              .then(() => {
+                this.setState({ loading: false, loggedIn: true});
+                this.props.history.push('/dashboard');
               })
           })
         }

@@ -3,8 +3,8 @@
 
 
 import {
-    Dimmer, Divider,
-    Message, Loader, Button
+    Divider,
+    Message, Button
 } from 'semantic-ui-react';
 
 import React, { Component } from "react";

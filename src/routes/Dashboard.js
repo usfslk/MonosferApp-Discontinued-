@@ -5,7 +5,8 @@ import {
   Button, Form, Divider,
   Dimmer, Loader, TextArea,
   Message, Modal, Header,
-  Input, Label, Icon
+  Input, Label, Icon, Card,
+  Image,
 } from 'semantic-ui-react';
 import React, { Component } from "react";
 import fire from "../config/Fire";
@@ -192,30 +193,36 @@ class Dashboard extends Component {
 
         {!this.state.loading && !this.state.error ?
           <div>
-            <h1>{this.state.name}</h1>
-            <p style={{ whiteSpace: 'pre-wrap' }}>{this.state.bio}</p>
 
-            <img src={this.state.image}
-              alt='profilePicture' width='120px' />
+            <Card>
+              <Image id="profileImage" src={this.state.image} />
+              <Card.Content >
+                <Card.Header>@{this.state.name}</Card.Header>
+                <Card.Meta>
+                  {this.state.free ?
+                    <p color='white'>
+                      Free
+                  </p>
+                    :
+                    <p color='white'>
+                      Premium
+                  </p>
+                  }
+                </Card.Meta>
+                <Card.Description style={{ whiteSpace: 'pre-wrap' }}>{this.state.bio}</Card.Description>
+              </Card.Content>
 
-            <Divider hidden />
-
-            {this.state.free ?
-              <Label color='white' horizontal>
-                Free
-            </Label>
-              :
-              <Label color='white' horizontal>
-                Premium
-            </Label>
-            }
-
-            <Divider hidden />
-
-            <Button href={'https://monosfer.com/' + this.state.name}
-              target='_blank' fluid color='grey' inverted compact>
-              View Profile
+              <Card.Content extra>
+                <Button href={'https://monosfer.com/' + this.state.name}
+                  target='_blank' style={{ backgroundColor: this.state.accent }} compact>
+                  <p style={{color: 'white'}} >
+                  View Profile
+                  </p>
               </Button>
+              </Card.Content>
+            </Card>
+
+            <Divider hidden />
 
             <h3>Edit Profile</h3>
             <Divider hidden />
