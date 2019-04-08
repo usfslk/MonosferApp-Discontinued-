@@ -222,7 +222,6 @@ class Dashboard extends Component {
               </Card.Content>
             </Card>
 
-            <Divider hidden />
 
             <h3>Edit Profile</h3>
             <Divider hidden />

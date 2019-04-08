@@ -90,8 +90,7 @@ class Home extends Component {
                 photoURL: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQdVmHPt9SajdsWlAZWzqRXkd-SzmmO9bBUV45fLnw5giijsty3OA',
               })
               .then(() => {
-                this.setState({ loading: false, loggedIn: true });
-                this.props.history.push('/dashboard');
+                this.setState({ loading: false, loggedIn: true, });
               })
           })
         }
@@ -211,6 +210,21 @@ class Home extends Component {
             </Button>
           </div>
         }
+
+        {!this.state.loggedIn ?
+          <div>
+            <Divider hidden />
+            <Label size='tiny'
+              color='black'
+              horizontal>
+              <Icon name='info circle' /> Ad
+          </Label>
+            <Divider hidden />
+            <a href="https://chrysntm.com/" target="_blank" title="Chrysntm Ad">
+              <img style={{ width: '100%' }} src="https://i.imgur.com/P5DTq98.jpg" alt="ad" />
+            </a>
+          </div>
+          : null }
 
         <Divider hidden />
       </div>
