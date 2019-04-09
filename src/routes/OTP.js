@@ -89,7 +89,7 @@ class OTP extends Component {
                     </div>
                 ) : null}
 
-            {!this.state.error && !this.state.verified ? ( 
+            {!this.state.error && !this.state.verified && !this.state.loading ? ( 
                 <div>
                     <Message >
                         <Message.Header>
@@ -101,7 +101,7 @@ class OTP extends Component {
                             You'll receive an email when it's done.
                             </p>
                         <h5>
-                            Send us an email at hello@monosfer.com if you have any question.
+                            Contact us at hello@monosfer.com if you have any question.
                             </h5>
                     </Message>
                     <Divider hidden />

@@ -341,7 +341,7 @@ class Dashboard extends Component {
         <Modal onClose={this.handleCloseSuccess}
           dimmer='blurring' size='mini'
           open={this.state.updateSuccess}
-          centered={true}>
+          centered={false}>
           <Header icon='checkmark' color='green' content='Updated successfully!' />
           <Modal.Content>
             <Modal.Description>
@@ -353,7 +353,7 @@ class Dashboard extends Component {
         <Modal onClose={this.handleCloseError}
           dimmer='blurring' size='mini'
           open={this.state.OTPError}
-          centered={true}>
+          centered={false}>
           <Header icon='close' color='red' content='ERROR' />
           <Modal.Content>
             <Modal.Description>
