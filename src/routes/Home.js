@@ -5,7 +5,6 @@
 import {
   Button, Form, Dimmer, Divider,
   Message, Loader, Input, Image,
-  Label, Icon,
 } from 'semantic-ui-react';
 
 import React, { Component } from "react";
@@ -84,6 +83,7 @@ class Home extends Component {
                 bio: 'Be original',
                 accent: '#0062b1',
                 OTP: OTP,
+                verified: false,
                 free: true,
                 fullName: userCredentials.user.displayName,
                 displayName: userCredentials.user.displayName,
@@ -210,21 +210,6 @@ class Home extends Component {
             </Button>
           </div>
         }
-
-        {!this.state.loggedIn ?
-          <div>
-            <Divider hidden />
-            <Label size='tiny'
-              color='black'
-              horizontal>
-              <Icon name='info circle' /> Ad
-          </Label>
-            <Divider hidden />
-            <a href="https://chrysntm.com/" target="_blank" title="Chrysntm Ad">
-              <img style={{ width: '100%' }} src="https://i.imgur.com/P5DTq98.jpg" alt="ad" />
-            </a>
-          </div>
-          : null }
 
         <Divider hidden />
       </div>

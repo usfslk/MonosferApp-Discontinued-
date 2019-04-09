@@ -5,14 +5,15 @@ import {
   Button, Form, Divider,
   Dimmer, Loader, TextArea,
   Message, Modal, Header,
-  Input, Label, Icon, Card,
-  Image,
+  Input, Label, Icon,
+  Image, Grid
 } from 'semantic-ui-react';
 import React, { Component } from "react";
 import fire from "../config/Fire";
 import "../App.css";
 import { CompactPicker } from 'react-color';
 import moment from "moment";
+import { CopyToClipboard } from 'react-copy-to-clipboard';
 
 class Dashboard extends Component {
   constructor(props) {
@@ -112,9 +113,8 @@ class Dashboard extends Component {
   };
 
   validateOTP = e => {
-    this.setState({ loading: true });
+    this.setState({ loading: true, OTPError: false });
     const self = this;
-    setInterval(function () {
       if (self.state.OTP === self.state.userOTP) {
         const { currentUser } = fire.auth();
         var event = moment().format('MMMM Do YYYY, h:mm:ss a');
@@ -138,7 +138,6 @@ class Dashboard extends Component {
       } else {
         self.setState({ OTPError: true, loading: false });
       }
-    }, 2000);
   };
 
   // Handlers
@@ -157,7 +156,9 @@ class Dashboard extends Component {
     fire.database().ref(`master/${currentUser.displayName}/links/${this.state.keys[index]}`)
       .remove()
   };
-  handleClose = () => this.setState({ updateSuccess: false });
+
+  handleCloseSuccess = () => this.setState({ updateSuccess: false });
+  handleCloseError = () => this.setState({ OTPError: false });
 
   render() {
     const listItems = this.state.data.map((item, index) =>
@@ -194,48 +195,65 @@ class Dashboard extends Component {
         {!this.state.loading && !this.state.error ?
           <div>
 
-            <Card>
-              <Image id="profileImage" src={this.state.image} />
-              <Card.Content >
-                <Card.Header>@{this.state.name}</Card.Header>
-                <Card.Meta>
+            <Grid>
+              <Grid.Row>
+                <Grid.Column width={8}>
+                  <Image id="profileImage" src={this.state.image} rounded />
+                  <h2>@{this.state.name}</h2>
                   {this.state.free ?
-                    <p color='white'>
-                      Free
-                  </p>
-                    :
-                    <p color='white'>
-                      Premium
-                  </p>
+                    <div>
+                      <Label>Free</Label>
+                    </div>
+                    : <Label>Premium</Label>
                   }
-                </Card.Meta>
-                <Card.Description style={{ whiteSpace: 'pre-wrap' }}>{this.state.bio}</Card.Description>
-              </Card.Content>
+                </Grid.Column>
+              </Grid.Row>
+            </Grid>
 
-              <Card.Content extra>
-                <Button href={'https://monosfer.com/' + this.state.name}
-                  target='_blank' style={{ backgroundColor: this.state.accent }} compact>
-                  <p style={{color: 'white'}} >
-                  View Profile
-                  </p>
-              </Button>
-              </Card.Content>
-            </Card>
+            <Divider />
 
+            <p style={{ whiteSpace: 'pre-wrap' }}>{this.state.bio}</p>
 
-            <h3>Edit Profile</h3>
+            <Button  href={'https://monosfer.com/' + this.state.name}
+              target='_blank' color='white' inverted compact>
+              <p>
+                View Profile
+             </p>
+            </Button>
+
+            {this.state.copied ? <h4 style={{ color: 'green' }}>Copied.</h4> :
+              null
+            }
+            <Divider hidden />
+
+            <Input fluid size='tiny'
+              action={
+                <CopyToClipboard text={'https://monosfer.com/' + this.state.name}
+                  onCopy={() => this.setState({ copied: true })}>
+                  <Button>Copy</Button>
+                </CopyToClipboard>
+
+              }
+              defaultValue={'https://monosfer.com/' + this.state.name}
+            />
+
+            <h3>Account</h3>
             <Divider hidden />
 
             <Form inverted>
-              <Form.Input
-                type="text" onChange={this.handleChange}
-                placeholder="Full Name" name="fullName" />
-              <Form.Input
-                type="text" onChange={this.handleChange}
-                placeholder="Profile Image URL" name="image" />
-              <TextArea placeholder="Bio" name="bio"
-                onChange={this.handleChange} style={{ minHeight: 100 }} />
-              <h5>Accent color:</h5>
+              <Input 
+                label='Display Name' fluid name="fullName"
+                type="text" onChange={this.handleChange} />
+                <Divider hidden />
+              <Input 
+                label='Profile Image URL' 
+                fluid type="text" name="image"
+                onChange={this.handleChange} />
+              <p>Bio</p>
+              <TextArea
+                name="bio" style={{ minHeight: 100 }}
+                onChange={this.handleChange}  />
+              <h5>Accent color</h5>
               <p style={{ color: this.state.accent }}>{this.state.accent}</p>
               <div style={{
                 backgroundColor: this.state.accent,
@@ -256,38 +274,27 @@ class Dashboard extends Component {
 
             {this.state.free ?
               <div>
-
                 <Label size='tiny'
                   color='black'
                   horizontal>
                   <Icon name='info circle' /> Ad
                 </Label>
                 <Divider hidden />
-                <a href="https://chrysntm.com/" target="_blank" title="Chrysntm Ad">
+                <a href="https://chrysntm.com/" rel="noopener noreferrer" target="_blank" title="Chrysntm Ad">
                   <img style={{ width: '100%' }} src="https://i.imgur.com/P5DTq98.jpg" alt="ad" />
                 </a>
-
                 <Divider hidden />
-
                 <p>This is a free account please upgrade to edit your links.</p>
                 <h5>Premium Account Lifetime Subscription (Ad-free)</h5>
-
                 <h2>$25</h2>
                 <Button
                   href='https://bmc.xyz/l/Bkp9Ifb0P'
-                  target='_blank' color='black' inverted compact>
+                  target='_blank' color='white' inverted compact>
                   Pay Now
                 </Button>
                 <Divider hidden />
                 <h3>Confirm your account</h3>
                 <p>Please enter your one-time password</p>
-                {this.state.OTPError && !this.state.loading ? (
-                  <div>
-                    <Message negative>
-                      <Message.Header>Please double-check and try again</Message.Header>
-                    </Message>
-                  </div>
-                ) : null}
                 <Divider hidden />
                 <Form inverted>
                   <Input type="text" name="userOTP"
@@ -302,7 +309,7 @@ class Dashboard extends Component {
                 </Form>
                 <Divider hidden />
               </div>
-              : null}
+            : null}
 
             {!this.state.free ? <div>
               <h3>Add Link</h3>
@@ -331,17 +338,26 @@ class Dashboard extends Component {
           </div>
           : null}
 
-        {this.state.logged}
-
-
-        <Modal onClose={this.handleClose}
+        <Modal onClose={this.handleCloseSuccess}
           dimmer='blurring' size='mini'
           open={this.state.updateSuccess}
-          centered={false}>
+          centered={true}>
           <Header icon='checkmark' color='green' content='Updated successfully!' />
           <Modal.Content>
             <Modal.Description>
               <p>Data has been saved.</p>
+            </Modal.Description>
+          </Modal.Content>
+        </Modal>
+
+        <Modal onClose={this.handleCloseError}
+          dimmer='blurring' size='mini'
+          open={this.state.OTPError}
+          centered={true}>
+          <Header icon='close' color='red' content='ERROR' />
+          <Modal.Content>
+            <Modal.Description>
+              <p>Please double-check and try again.</p>
             </Modal.Description>
           </Modal.Content>
         </Modal>

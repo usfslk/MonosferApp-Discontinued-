@@ -17,9 +17,9 @@ body,
     font-family: 'Roboto', sans-serif;
     font-weight: 400;
 }
-
 #profileImage {
 	object-fit: cover !important;
-	min-height: 300px;
-	height: 300px;
+	min-height: 100px;
+  height: 100px;
+  width: 100px !important;
 }

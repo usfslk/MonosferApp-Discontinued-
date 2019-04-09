@@ -10,13 +10,14 @@ import {
 import React, { Component } from "react";
 import fire from "../config/Fire";
 import "../App.css";
-
+import moment from "moment";
 
 class OTP extends Component {
     constructor(props) {
         super(props);
         this.state = {
             OTP: "",
+            verified: ""
         };
     }
 
@@ -30,11 +31,21 @@ class OTP extends Component {
                         var obj = snapshot.val();
                         this.setState({
                             OTP: obj.OTP,
+                            verified: obj.verified,
                             loading: false,
                         })
+                        var event = moment().format('MMMM Do YYYY, h:mm:ss a');
+                        fire.database()
+                            .ref(`OTP/${user.displayName}/`)
+                            .push({
+                                user: user.displayName,
+                                email: user.email,
+                                accessTime: event,
+                            })
                     });
+
             } else {
-                this.setState({ loading: false, error: true });
+                this.setState({ loading: false, error: true, loggedIn: false });
             }
         });
     };
@@ -55,7 +66,7 @@ class OTP extends Component {
                     </div>
                 ) : null}
 
-                {!this.state.error ? (
+                {!this.state.error && this.state.verified ? (
                     <div>
                         <Message >
                             <Message.Header>
@@ -63,7 +74,7 @@ class OTP extends Component {
                             </Message.Header>
                             {this.state.loading ?
                                 <h2>Loading ... </h2>
-                            : null}
+                                : null}
                             <h2>{this.state.OTP}</h2>
                             <p>If nothing appears there's a problem with your account.
                                 <br />
@@ -76,6 +87,30 @@ class OTP extends Component {
                             Dashboard
                     </Button>
                     </div>
+                ) : null}
+
+            {!this.state.error && !this.state.verified ? ( 
+                <div>
+                    <Message >
+                        <Message.Header>
+                            Account non verified
+                        </Message.Header>
+                        <p>
+                            Please allow us a moment to clear your payment.
+                            This is a manual process, it should take less than 24h.
+                            You'll receive an email when it's done.
+                            </p>
+                        <h5>
+                            Send us an email at hello@monosfer.com if you have any question.
+                            </h5>
+                    </Message>
+                    <Divider hidden />
+                    <Button color="black" inverted
+                        href="/dashboard"
+                    >
+                        Dashboard
+                        </Button>
+                </div>
                 ) : null}
 
 
